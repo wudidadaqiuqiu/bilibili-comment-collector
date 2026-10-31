@@ -20,11 +20,20 @@
 
   /** 从组件实例上摘出我们要的字段，字段缺失一律降级为安全默认值。 */
   function pick(el) {
-    let d;
+    let d = null;
     try {
       d = el.data;
     } catch {
-      return null;
+      d = null;
+    }
+    // Firefox 兜底：若 MAIN world 未被支持，脚本会退回隔离世界，此时
+    // `el.data` 读不到，但可以透过 Xray 用 wrappedJSObject 触及页面对象。
+    if (!d && el.wrappedJSObject) {
+      try {
+        d = el.wrappedJSObject.data;
+      } catch {
+        d = null;
+      }
     }
     if (!d || d.rpid == null) return null;
 

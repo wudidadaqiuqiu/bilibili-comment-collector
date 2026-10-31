@@ -90,7 +90,29 @@ for (const [declared, file] of Object.entries(manifest.icons || {})) {
   }
 }
 
-console.log('\n4. JS 语法');
+console.log('\n4. 双浏览器兼容');
+const bg = manifest.background || {};
+if (bg.service_worker) ok('Chrome 入口：background.service_worker');
+else bad('缺少 background.service_worker（Chrome 需要）');
+if (Array.isArray(bg.scripts) && bg.scripts.length) ok('Firefox 入口：background.scripts');
+else bad('缺少 background.scripts（Firefox 不支持 service_worker）');
+if (bg.service_worker && Array.isArray(bg.scripts) && bg.scripts[0] !== bg.service_worker) {
+  bad('background.scripts 与 service_worker 指向了不同文件');
+}
+// MV3 里同时写 background.scripts，Chrome 121 之前会直接拒绝加载
+const minChrome = Number(manifest.minimum_chrome_version || 0);
+if (minChrome >= 121) ok(`minimum_chrome_version = ${minChrome}（≥121 才会忽略 background.scripts）`);
+else bad(`minimum_chrome_version 应 ≥121，当前 ${manifest.minimum_chrome_version || '未设置'}`);
+
+const geckoId = manifest.browser_specific_settings?.gecko?.id;
+if (geckoId) ok(`Firefox 扩展 ID：${geckoId}`);
+else bad('缺少 browser_specific_settings.gecko.id（Firefox 安装/签名需要）');
+
+const mainWorld = manifest.content_scripts.filter((cs) => cs.world === 'MAIN');
+if (mainWorld.length) ok(`${mainWorld.length} 段 content script 声明了 world: MAIN`);
+else bad('没有 world: MAIN 的 content script，bridge.js 将无法读取页面对象');
+
+console.log('\n5. JS 语法');
 const files = await walk(path.join(root, 'src'));
 files.push(path.join(root, 'scripts', 'check.mjs'));
 for (const file of files) {

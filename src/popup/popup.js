@@ -1,4 +1,5 @@
 import { STORAGE_KEY, relativeTime } from '../shared/model.js';
+import { storageGet } from '../shared/browser.js';
 
 const MANAGER_URL = chrome.runtime.getURL('src/manager/manager.html');
 
@@ -15,7 +16,7 @@ function openManager(query) {
 }
 
 async function loadItems() {
-  const bag = await chrome.storage.local.get(STORAGE_KEY);
+  const bag = await storageGet(STORAGE_KEY);
   const items = bag[STORAGE_KEY];
   return Array.isArray(items) ? items : [];
 }

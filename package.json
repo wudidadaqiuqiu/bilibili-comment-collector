@@ -1,15 +1,22 @@
 {
   "name": "bilibili-comment-collector",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
-  "description": "一键收藏 B 站评论（含楼中楼），本地存储、可搜索、可跳回原楼层、可导出 Markdown/JSON/CSV 的 Chrome 扩展",
+  "description": "一键收藏 B 站评论（含楼中楼）的 Chrome / Firefox 扩展：本地存储、可搜索/标签/备注、可跳回原楼层、可导出 Markdown/JSON/CSV",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/wudidadaqiuqiu/bilibili-comment-collector.git"
   },
-  "keywords": ["bilibili", "chrome-extension", "manifest-v3", "bookmark", "comments"],
+  "keywords": [
+    "bilibili",
+    "chrome-extension",
+    "firefox-extension",
+    "manifest-v3",
+    "bookmark",
+    "comments"
+  ],
   "scripts": {
     "check": "node scripts/check.mjs"
   }

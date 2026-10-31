@@ -325,28 +325,34 @@
       return;
     }
     const want = m[1];
-    if (locatedRpid === want) return;
 
     for (const el of collect()) {
       const p = payloadOf(el);
       if (!p || p.rpid !== want) continue;
-      locatedRpid = want;
+
+      // 每轮都确保描边还在：B 站会重渲染评论节点，换过节点后样式会丢。
       markLocated(el);
+
+      if (locatedRpid !== want) {
+        locatedRpid = want;
+        try {
+          el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        } catch {
+          el.scrollIntoView();
+        }
+        toast('已定位到你收藏的那条评论');
+      }
       return;
     }
   }
 
   function markLocated(el) {
+    if (el.dataset.bshcLocated === '1') return;
+    el.dataset.bshcLocated = '1';
     el.style.borderLeft = '3px solid #FB7299';
     el.style.paddingLeft = '8px';
     el.style.borderRadius = '4px';
     el.style.background = 'rgba(251, 114, 153, .07)';
-    try {
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    } catch {
-      el.scrollIntoView();
-    }
-    toast('已定位到你收藏的那条评论');
   }
 
   /* --------------------------------- 主循环 -------------------------------- */

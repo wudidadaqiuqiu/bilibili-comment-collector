@@ -6,6 +6,7 @@ import {
   matchItem,
   relativeTime,
 } from '../shared/model.js';
+import { storageGet } from '../shared/browser.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -58,7 +59,7 @@ function toast(text) {
 }
 
 async function loadItems() {
-  const bag = await chrome.storage.local.get(STORAGE_KEY);
+  const bag = await storageGet(STORAGE_KEY);
   const list = bag[STORAGE_KEY];
   state.items = Array.isArray(list) ? list : [];
 }

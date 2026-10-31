@@ -3,10 +3,12 @@
 给 B 站评论区加一个「☆ 收藏」按钮：**一条神评，点一下就存下来**，之后能搜、能打标签、能跳回原楼层，还能导出成 Markdown / JSON / CSV。
 
 不登录、不联网、不调 B 站接口 —— 只读页面已经渲染出来的评论，数据全部存在浏览器本地。
+**Chrome / Edge / Firefox 通用**（同一份代码，manifest 同时声明了两套 background 入口）。
 
 ![许可证](https://img.shields.io/badge/license-MIT-blue)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-4c8fbd)
-![Chrome 111+](https://img.shields.io/badge/Chrome-111%2B-yellow)
+![Chrome 121+](https://img.shields.io/badge/Chrome-121%2B-yellow)
+![Firefox 128+](https://img.shields.io/badge/Firefox-128%2B-orange)
 
 ![评论区效果](docs/screenshot-comments.png)
 
@@ -29,7 +31,7 @@ B 站自带的「收藏」只能收藏视频，看到一条好评论，只能截
 
 ## 安装
 
-### 方式一：下载发布包（推荐）
+### Chrome / Edge
 
 1. 到 [Releases](../../releases) 下载最新的 `bilibili-comment-collector-x.y.z.zip`
 2. 解压到任意固定目录（**不要放在临时目录，删了就没了**）
@@ -37,16 +39,32 @@ B 站自带的「收藏」只能收藏视频，看到一条好评论，只能截
 4. 点**加载已解压的扩展程序**，选择解压出来的文件夹
 5. 打开任意 B 站视频页，鼠标移到评论上，操作栏末尾点「☆ 收藏」
 
-> 需要 Chrome / Edge 111 或更高版本（用到 `world: "MAIN"` 的 content script）。
+> 需要 Chrome / Edge 121 或更高版本（用到了 `world: "MAIN"` 的 content script；
+> 为了兼容 Firefox，manifest 里同时写了 `background.scripts`，而 Chrome 121 之前会因此拒绝加载）。
 > 首次安装后如果评论按钮没出现，刷新一下页面。
 
-### 方式二：克隆源码
+### Firefox
+
+Firefox 不能直接加载 zip，需要解压后用临时附加组件加载：
+
+1. 同样下载并解压发布包
+2. 地址栏打开 `about:debugging#/runtime/this-firefox`
+3. 点**临时载入附加组件…**，选中解压目录里的 `manifest.json`
+4. 打开 B 站视频页即可
+
+> - **重启浏览器后临时组件会消失**，需要重新载入。想长期使用得起个名字签名：上架
+>   [AMO](https://addons.mozilla.org/developers/)（可以是 unlisted 自用），审核通过后拿到 `.xpi` 就能正常安装。
+> - 未签名的 `.xpi` 在正式版 Firefox 里装不上，这是 Mozilla 的强制策略，不是扩展的问题。
+> - 需要 Firefox 128 或更高版本。
+
+### 从源码加载
 
 ```bash
 git clone https://github.com/wudidadaqiuqiu/bilibili-comment-collector.git
 ```
 
-然后在 `chrome://extensions` 里「加载已解压的扩展程序」选择仓库根目录（`manifest.json` 就在根目录）。
+Chrome：`chrome://extensions` →「加载已解压的扩展程序」→ 选仓库根目录。
+Firefox：`about:debugging` →「临时载入附加组件」→ 选仓库根目录的 `manifest.json`。
 
 ## 用法
 
@@ -101,6 +119,10 @@ bili-comments                     ← document.querySelector('bili-comments')
 
 这样隔离世界始终有 `chrome.runtime` 可用，又不需要用 `postMessage` 传递 DOM 引用。
 
+Firefox 128+ 同样支持 `world: "MAIN"`，所以两个浏览器走同一条路径。另外 `bridge.js` 还留了一层兜底：
+若某个版本不认 `world`，脚本退回隔离世界后 `el.data` 读不到，会改用 `el.wrappedJSObject.data`
+透过 Xray 读页面对象 —— 功能仍然是好的。
+
 **2. 跳到指定楼层**
 
 B 站前端代码里有 `var Fm = /^#reply(\d+)$/`：hash 命中时把 rpid 作为 `seekId` 传给评论组件，并关闭懒加载。这就是官方「复制评论链接」背后的机制，扩展直接复用，不用自己翻页查找。
@@ -108,6 +130,11 @@ B 站前端代码里有 `var Fm = /^#reply(\d+)$/`：hash 命中时把 rpid 作�
 **样式**：按钮注入在 shadow root 里，页面 CSS 进不来。用 `CSSStyleSheet` + `adoptedStyleSheets` 把一份样式表挂到所有相关 shadow root（不可用时退回 `<style>` 标签）。
 
 **并发**：所有写操作都经过 background 的串行队列，多标签页同时收藏不会互相覆盖。
+
+**跨浏览器**：Chrome 的 MV3 只认 `background.service_worker`，Firefox 只认 `background.scripts`，
+所以 manifest 里两个都写（[MDN 推荐写法](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background#cross-browser_manifest_v3_background_scripts)），
+各自忽略对方那个键。存储读写统一走 `src/shared/browser.js`，因为 Firefox 的 `chrome.*`
+在部分版本没有 Promise —— 直接 `await chrome.storage.local.get()` 会拿到 `undefined` 而静默失败。
 
 ## 目录结构
 
@@ -117,6 +144,7 @@ bilibili-comment-collector/
 ├── src/
 │   ├── background.js          Service Worker：唯一写入方、串行队列、角标
 │   ├── shared/model.js        数据规范化、搜索、导出（纯函数）
+│   ├── shared/browser.js      storage 的 Promise/回调双兼容包装（Firefox 老版本只有回调）
 │   ├── content/
 │   │   ├── bridge.js          MAIN world：把 .data 写成 data-bshc
 │   │   ├── content.js         隔离世界：注入按钮、收藏、深链高亮
@@ -134,6 +162,10 @@ bilibili-comment-collector/
 npm run check     # 等价于 CI 跑的自检，无需安装依赖
 ```
 
+自检除了 manifest 引用、JS 语法、图标尺寸，还会校验**双浏览器**的关键点：
+`background.scripts` 与 `service_worker` 是否都声明、`minimum_chrome_version` 是否 ≥121、
+`browser_specific_settings.gecko.id` 是否存在、是否还有 `world: "MAIN"` 的 content script。
+
 改完代码在 `chrome://extensions` 点该扩展的刷新按钮即可，**然后在已打开的 B 站页面刷新一次**（content script 不会热更新）。
 
 发布：
@@ -150,6 +182,9 @@ git tag v1.1.0 && git push origin v1.1.0
 - 极少数页面（如部分专题页）评论组件结构不同，按钮不会出现
 - 页面结构若大改导致按钮消失，改这两个函数即可：`src/content/bridge.js` 的 `collect()`、`src/content/content.js` 的 `collect()`
 - 收藏时记下的是那一刻的点赞数，之后不会更新
+- **Firefox 上组件重渲染后可能丢按钮**：评论列表刷新时 B 站会替换节点，扩展 0.9 秒轮询一次自动补回来，正常看不到闪烁
+- **Firefox 重启后扩展消失**：临时附加组件的固有行为，需要签名安装才能长期使用（见「安装」）
+- 两个浏览器的收藏数据各自独立（各存各的 `storage.local`），不能互通；用「导出 JSON / 导入」迁移
 
 ## 排错
 
@@ -163,6 +198,8 @@ __BSHC_DUMP__()   // 桥接层当前抓到的评论数组
 - `__BSHC_DUMP__ is not defined` → `bridge.js` 没注入，确认 Chrome ≥ 111
 - 点收藏提示「后台没有响应」→ Service Worker 被回收或扩展刚更新，刷新页面
 - 收藏夹页面空白 → 打开 `chrome://extensions` 看该扩展有无红色报错
+- **Firefox 里按钮不出现**：确认版本 ≥ 128；再看 `about:debugging` 里扩展是否还挂着（重启后需要重新载入），
+  以及是否在 `about:debugging` 的「检查」里能看到 console 报错
 
 ## 免责声明
 

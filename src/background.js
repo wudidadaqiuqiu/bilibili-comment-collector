@@ -3,6 +3,7 @@
  * 所有变更串行排队，避免多标签页同时收藏时互相覆盖（storage 读改写竞态）。
  */
 import { STORAGE_KEY, makeId, normalizeItem } from './shared/model.js';
+import { storageGet, storageSet } from './shared/browser.js';
 
 /* ------------------------------- 串行写入队列 ------------------------------- */
 
@@ -16,13 +17,13 @@ function mutate(fn) {
 }
 
 async function readAll() {
-  const bag = await chrome.storage.local.get(STORAGE_KEY);
+  const bag = await storageGet(STORAGE_KEY);
   const list = bag[STORAGE_KEY];
   return Array.isArray(list) ? list : [];
 }
 
 async function writeAll(items) {
-  await chrome.storage.local.set({ [STORAGE_KEY]: items });
+  await storageSet({ [STORAGE_KEY]: items });
 }
 
 /* --------------------------------- 角标 --------------------------------- */
