@@ -45,17 +45,17 @@ B 站自带的「收藏」只能收藏视频，看到一条好评论，只能截
 
 ### Firefox
 
-Firefox 不能直接加载 zip，需要解压后用临时附加组件加载：
+**已通过 AMO 审核并获得 Mozilla 签名**（分发方式为 *On your own*，即自用分发，因此 AMO 商城没有公开页面）。
 
-1. 同样下载并解压发布包
-2. 地址栏打开 `about:debugging#/runtime/this-firefox`
-3. 点**临时载入附加组件…**，选中解压目录里的 `manifest.json`
-4. 打开 B 站视频页即可
+安装：拿到签名后的 `.xpi`，直接拖进 Firefox 窗口；或 `about:addons` → 右上角齿轮 → **从文件安装附加组件**。
+**装完永久生效，重启浏览器不会消失。**
 
-> - **重启浏览器后临时组件会消失**，需要重新载入。想长期使用得起个名字签名：上架
->   [AMO](https://addons.mozilla.org/developers/)（可以是 unlisted 自用），审核通过后拿到 `.xpi` 就能正常安装。
-> - 未签名的 `.xpi` 在正式版 Firefox 里装不上，这是 Mozilla 的强制策略，不是扩展的问题。
-> - 需要 Firefox 140 或更高版本（AMO 自 2025-11-03 起强制要求 manifest 声明数据收集类型，该字段只有 140+ 认识）。
+> - 需要 Firefox 140 或更高版本（AMO 自 2025-11-03 起强制要求 manifest 声明数据收集类型 `data_collection_permissions`，该字段只有 140+ 认识）。
+> - 未签名的 `.xpi` 在正式版 Firefox 上装不上，这是 Mozilla 的强制策略。自己改代码调试时，用
+>   `about:debugging#/runtime/this-firefox` → **临时载入附加组件** 选源码目录即可（这种是临时的，重启失效）。
+> - 想让它出现在 AMO 搜索结果里，需要用同一个 `gecko.id` 再提交一次并选择 *On this site*（listed），
+>   审核通过后才有公开商店页。
+> - 自用分发不会自动更新：升级要手动安装新的 `.xpi`。
 
 ### 从源码加载
 
@@ -199,7 +199,7 @@ git tag v1.1.0 && git push origin v1.1.0
 - 页面结构若大改导致按钮消失，改这两个函数即可：`src/content/bridge.js` 的 `collect()`、`src/content/content.js` 的 `collect()`
 - 收藏时记下的是那一刻的点赞数，之后不会更新
 - **Firefox 上组件重渲染后可能丢按钮**：评论列表刷新时 B 站会替换节点，扩展 0.9 秒轮询一次自动补回来，正常看不到闪烁
-- **Firefox 重启后扩展消失**：临时附加组件的固有行为，需要签名安装才能长期使用（见「安装」）
+- **Firefox 侧是自用分发**：不跟随 AMO 自动更新，升级需手动装新版本 `.xpi`
 - 两个浏览器的收藏数据各自独立（各存各的 `storage.local`），不能互通；用「导出 JSON / 导入」迁移
 
 ## 排错
@@ -214,8 +214,8 @@ __BSHC_DUMP__()   // 桥接层当前抓到的评论数组
 - `__BSHC_DUMP__ is not defined` → `bridge.js` 没注入，确认 Chrome ≥ 111
 - 点收藏提示「后台没有响应」→ Service Worker 被回收或扩展刚更新，刷新页面
 - 收藏夹页面空白 → 打开 `chrome://extensions` 看该扩展有无红色报错
-- **Firefox 里按钮不出现**：确认版本 ≥ 128；再看 `about:debugging` 里扩展是否还挂着（重启后需要重新载入），
-  以及是否在 `about:debugging` 的「检查」里能看到 console 报错
+- **Firefox 里按钮不出现**：确认 Firefox ≥ 140；`about:addons` 里确认扩展处于启用状态、
+  且在 B 站页面授予了权限；用 `about:debugging` 的「检查」可以看到内容脚本的 console 报错
 
 ## 免责声明
 
