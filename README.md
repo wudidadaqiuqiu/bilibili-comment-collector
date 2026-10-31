@@ -160,6 +160,7 @@ bilibili-comment-collector/
 
 ```bash
 npm run check     # 等价于 CI 跑的自检，无需安装依赖
+npm run build     # 打包到 dist/，产出 .zip 与 Firefox 用的 .xpi
 ```
 
 自检除了 manifest 引用、JS 语法、图标尺寸，还会校验**双浏览器**的关键点：
@@ -168,13 +169,24 @@ npm run check     # 等价于 CI 跑的自检，无需安装依赖
 
 改完代码在 `chrome://extensions` 点该扩展的刷新按钮即可，**然后在已打开的 B 站页面刷新一次**（content script 不会热更新）。
 
+打包产物（`dist/`）：
+
+| 文件 | 用途 |
+|---|---|
+| `bilibili-comment-collector-<ver>.zip` | Chrome / Edge 加载已解压 |
+| `bilibili-comment-collector-<ver>-firefox.xpi` | 上传 AMO 签名；相对通用包剥掉了 `background.service_worker` 与 `minimum_chrome_version` 两个 Chrome 专用字段，避免 AMO 校验器报警 |
+
 发布：
 
 ```bash
 # 1. 先改 manifest.json 和 package.json 的版本号并提交
-# 2. 打 tag 推送，Release 由 workflow 自动创建并附上 zip
+# 2. 打 tag 推送，Release 由 workflow 自动创建，两个包都会挂上去
 git tag v1.1.0 && git push origin v1.1.0
 ```
+
+上架 AMO 的流程：`npm run build` → 到 [AMO 开发者中心](https://addons.mozilla.org/developers/addon/submit/distribution)
+上传 `dist/*-firefox.xpi` → 选自用分发（On your own）→ 等自动校验通过 → 下载签名好的 `.xpi` 安装。
+签名后的 `.xpi` 会保留 `browser_specific_settings.gecko.id`，所以每次更新都算同一个扩展的升级。
 
 ## 已知边界
 
