@@ -261,6 +261,11 @@ select {
   font-size: 11px;
 }
 
+.badge-pic {
+  background: rgba(0, 174, 236, 0.12);
+  color: #00aeec;
+}
+
 .src {
   color: var(--text-3);
   text-decoration: none;
@@ -291,6 +296,29 @@ select {
 .text[data-open="1"] {
   -webkit-line-clamp: unset;
   display: block;
+}
+
+.pics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pics img {
+  height: 104px;
+  max-width: 240px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  cursor: zoom-in;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.pics img:hover {
+  transform: scale(1.02);
+  border-color: var(--pink-line);
 }
 
 .tags {

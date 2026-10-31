@@ -50,6 +50,18 @@ export function normalizeItem(raw) {
   };
   const root = str(raw.root, 32) || '0';
 
+  // 评论配图：只保留 http(s) 地址，最多 9 张
+  const pictures = Array.isArray(raw.pictures)
+    ? raw.pictures
+        .slice(0, 9)
+        .map((pic) => {
+          let src = str(pic && pic.src, 512);
+          if (src.startsWith('//')) src = 'https:' + src;
+          return { src, w: Number(pic && pic.w) || 0, h: Number(pic && pic.h) || 0 };
+        })
+        .filter((pic) => /^https?:\/\//.test(pic.src))
+    : [];
+
   return {
     id: makeId({ type, oid, rpid }),
     rpid,
@@ -63,6 +75,7 @@ export function normalizeItem(raw) {
     ctime: Number(raw.ctime) || 0,
     like: Number(raw.like) || 0,
     source,
+    pictures,
     jumpUrl: str(raw.jumpUrl, 600) || makeJumpUrl(source, rpid, root),
     tags: Array.isArray(raw.tags) ? raw.tags.map((t) => str(t, 24)).filter(Boolean).slice(0, 12) : [],
     note: str(raw.note, 2000),
@@ -173,6 +186,9 @@ export function toMarkdown(items) {
       if (item.jumpUrl) lines.push(`- [原楼层链接](${item.jumpUrl})`);
       if (item.tags?.length) lines.push(`- 标签：${item.tags.map((t) => `\`${t}\``).join(' ')}`);
       lines.push('', '> ' + String(item.text || '').replace(/\n/g, '\n> '), '');
+      if (item.pictures && item.pictures.length) {
+        lines.push(item.pictures.map((pic, i) => `![图${i + 1}](${pic.src})`).join(' '), '');
+      }
       if (item.note) lines.push(`备注：${item.note}`, '');
     }
   }
@@ -190,6 +206,7 @@ const CSV_HEAD = [
   '点赞',
   '类型',
   '正文',
+  '配图',
   '标签',
   '备注',
 ];
@@ -214,6 +231,7 @@ export function toCSV(items) {
         item.like || 0,
         item.isReply ? '楼中楼' : '评论',
         item.text,
+        (item.pictures || []).map((pic) => pic.src).join(' '),
         (item.tags || []).join(' '),
         item.note,
       ]

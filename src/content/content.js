@@ -175,6 +175,7 @@
       root: p.root,
       parent: p.parent,
       text: String(p.text || '').trim(),
+      pictures: Array.isArray(p.pictures) ? p.pictures : [],
       author: { mid: p.mid || '', name: p.uname || '', avatar: p.avatar || '' },
       ctime: p.ctime || 0,
       like: p.like || 0,

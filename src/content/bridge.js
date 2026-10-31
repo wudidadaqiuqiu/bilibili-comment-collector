@@ -41,6 +41,17 @@
     const content = d.content || {};
     const text = String(content.message ?? '');
 
+    // 评论配图：content.pictures[{img_src,img_width,img_height,img_size}]
+    const rawPics = Array.isArray(content.pictures) ? content.pictures : [];
+    const pictures = rawPics
+      .slice(0, 9)
+      .map((pic) => {
+        let src = String(pic.img_src || '');
+        if (src.startsWith('//')) src = 'https:' + src;
+        return { src, w: Number(pic.img_width) || 0, h: Number(pic.img_height) || 0 };
+      })
+      .filter((pic) => /^https?:\/\//.test(pic.src));
+
     return {
       rpid: String(d.rpid),
       oid: String(d.oid ?? ''),
@@ -53,6 +64,7 @@
       uname: String(member.uname ?? ''),
       mid: String(member.mid ?? d.mid ?? ''),
       avatar: String(member.avatar ?? ''),
+      pictures,
     };
   }
 

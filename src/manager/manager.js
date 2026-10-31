@@ -224,6 +224,13 @@ function buildCard(item) {
     head.append(badge);
   }
 
+  if (item.pictures && item.pictures.length) {
+    const picBadge = document.createElement('span');
+    picBadge.className = 'badge badge-pic';
+    picBadge.textContent = item.pictures.length + ' 图';
+    head.append(picBadge);
+  }
+
   const when = document.createElement('span');
   when.textContent = relativeTime(item.createdAt);
   when.title = formatTime(item.createdAt);
@@ -251,6 +258,23 @@ function buildCard(item) {
     text.dataset.open = text.dataset.open === '1' ? '0' : '1';
   });
   card.append(text);
+
+  /* 评论配图：缩略图，点击看原图 */
+  if (item.pictures && item.pictures.length) {
+    const pics = document.createElement('div');
+    pics.className = 'pics';
+    item.pictures.forEach((pic, i) => {
+      const img = document.createElement('img');
+      img.src = pic.src;
+      img.alt = '配图 ' + (i + 1);
+      img.loading = 'lazy';
+      img.referrerPolicy = 'no-referrer';
+      img.title = '点击查看原图';
+      img.addEventListener('click', () => chrome.tabs.create({ url: pic.src }));
+      pics.append(img);
+    });
+    card.append(pics);
+  }
 
   /* 标签 */
   const tags = document.createElement('div');
