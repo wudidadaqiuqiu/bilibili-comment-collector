@@ -68,12 +68,14 @@ jobs:
           TAG="${{ steps.ver.outputs.tag }}"
           VERSION="${{ steps.ver.outputs.version }}"
           NOTES="## 安装
+
           **Chrome / Edge**：下载 \`bilibili-comment-collector-$VERSION.zip\`，解压到固定目录，
           打开 chrome://extensions → 开启开发者模式 → 加载已解压的扩展程序 → 选解压后的文件夹。
 
-          **Firefox**：下载 \`bilibili-comment-collector-$VERSION-firefox.xpi\`。
-          正式版 Firefox 只接受已签名扩展，这个包是 AMO 上架用的；未签名时可用
-          about:debugging → 临时载入附加组件（重启后失效）。"
+          **Firefox**：需要 Firefox 140+。本项目已通过 AMO 审核并签名，
+          拿到签名后的 \`.xpi\` 直接拖进 Firefox 窗口，或 about:addons → 齿轮 → 从文件安装附加组件。
+          随本 Release 发布的 \`-firefox.xpi\` 是**未签名**的上传用包，不能直接装进正式版 Firefox。"
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/*.zip dist/*.xpi --clobber
           else
