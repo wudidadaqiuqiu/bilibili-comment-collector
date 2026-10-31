@@ -8,7 +8,7 @@
 ![许可证](https://img.shields.io/badge/license-MIT-blue)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-4c8fbd)
 ![Chrome 121+](https://img.shields.io/badge/Chrome-121%2B-yellow)
-![Firefox 128+](https://img.shields.io/badge/Firefox-128%2B-orange)
+![Firefox 140+](https://img.shields.io/badge/Firefox-140%2B-orange)
 
 ![评论区效果](docs/screenshot-comments.png)
 
@@ -55,7 +55,7 @@ Firefox 不能直接加载 zip，需要解压后用临时附加组件加载：
 > - **重启浏览器后临时组件会消失**，需要重新载入。想长期使用得起个名字签名：上架
 >   [AMO](https://addons.mozilla.org/developers/)（可以是 unlisted 自用），审核通过后拿到 `.xpi` 就能正常安装。
 > - 未签名的 `.xpi` 在正式版 Firefox 里装不上，这是 Mozilla 的强制策略，不是扩展的问题。
-> - 需要 Firefox 128 或更高版本。
+> - 需要 Firefox 140 或更高版本（AMO 自 2025-11-03 起强制要求 manifest 声明数据收集类型，该字段只有 140+ 认识）。
 
 ### 从源码加载
 
@@ -86,6 +86,10 @@ Firefox：`about:debugging` →「临时载入附加组件」→ 选仓库根目
 - 想清空重来：`chrome://extensions` 移除扩展，或逐条删除
 
 隐私：扩展不读取账号信息，不发起任何网络请求，不做任何上报。
+
+manifest 里已按 AMO 的强制要求声明 `data_collection_permissions: { "required": ["none"] }` ——
+这里的 "none" 指**没有任何数据被收集并传输到扩展之外**；收藏内容只写进你自己的
+`chrome.storage.local`，换机器要靠手动导出 / 导入。
 
 ## 它是怎么工作的
 
@@ -119,7 +123,7 @@ bili-comments                     ← document.querySelector('bili-comments')
 
 这样隔离世界始终有 `chrome.runtime` 可用，又不需要用 `postMessage` 传递 DOM 引用。
 
-Firefox 128+ 同样支持 `world: "MAIN"`，所以两个浏览器走同一条路径。另外 `bridge.js` 还留了一层兜底：
+Firefox 同样支持 `world: "MAIN"`，所以两个浏览器走同一条路径。另外 `bridge.js` 还留了一层兜底：
 若某个版本不认 `world`，脚本退回隔离世界后 `el.data` 读不到，会改用 `el.wrappedJSObject.data`
 透过 Xray 读页面对象 —— 功能仍然是好的。
 

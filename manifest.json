@@ -1,19 +1,29 @@
 {
   "manifest_version": 3,
   "name": "B站评论收藏夹",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "minimum_chrome_version": "121",
   "description": "一键收藏 B 站评论和楼中楼回复。数据只存在本地，支持搜索、标签、备注、跳回原楼层，以及 Markdown / JSON / CSV 导出。",
-  "permissions": ["storage", "unlimitedStorage"],
+  "permissions": [
+    "storage",
+    "unlimitedStorage"
+  ],
   "background": {
-    "scripts": ["src/background.js"],
+    "scripts": [
+      "src/background.js"
+    ],
     "service_worker": "src/background.js",
     "type": "module"
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "bilibili-comment-collector@wudidadaqiuqiu",
-      "strict_min_version": "128.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
   "action": {
@@ -45,7 +55,9 @@
         "https://www.bilibili.com/festival/*",
         "https://t.bilibili.com/*"
       ],
-      "js": ["src/content/bridge.js"],
+      "js": [
+        "src/content/bridge.js"
+      ],
       "world": "MAIN",
       "run_at": "document_idle",
       "all_frames": false
@@ -61,8 +73,12 @@
         "https://www.bilibili.com/festival/*",
         "https://t.bilibili.com/*"
       ],
-      "js": ["src/content/content.js"],
-      "css": ["src/content/content.css"],
+      "js": [
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
       "run_at": "document_idle",
       "all_frames": false
     }

@@ -51,6 +51,16 @@ jobs:
       - name: 列出产物
         run: ls -la dist/
 
+      # 用 AMO 同一套校验器跑一遍，避免上传后才被打回
+      - name: AMO 校验（addons-linter）
+        run: |
+          npx --yes addons-linter@10.15.0 dist/*-firefox.xpi | tee /tmp/amo-lint.txt
+          # 只允许“不支持 Android”这类警告，出现 error 就失败
+          if grep -qE '^errors +[1-9]' /tmp/amo-lint.txt; then
+            echo "::error::addons-linter 报错，先修好再发版"
+            exit 1
+          fi
+
       - name: 创建 Release
         env:
           GH_TOKEN: ${{ github.token }}

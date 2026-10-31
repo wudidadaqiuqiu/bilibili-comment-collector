@@ -104,9 +104,20 @@ const minChrome = Number(manifest.minimum_chrome_version || 0);
 if (minChrome >= 121) ok(`minimum_chrome_version = ${minChrome}（≥121 才会忽略 background.scripts）`);
 else bad(`minimum_chrome_version 应 ≥121，当前 ${manifest.minimum_chrome_version || '未设置'}`);
 
-const geckoId = manifest.browser_specific_settings?.gecko?.id;
-if (geckoId) ok(`Firefox 扩展 ID：${geckoId}`);
+const gecko = manifest.browser_specific_settings?.gecko || {};
+if (gecko.id) ok(`Firefox 扩展 ID：${gecko.id}`);
 else bad('缺少 browser_specific_settings.gecko.id（Firefox 安装/签名需要）');
+
+// AMO 自 2025-11-03 起强制要求声明数据收集类型，缺了会直接校验失败
+const dcp = gecko.data_collection_permissions;
+if (dcp && Array.isArray(dcp.required) && dcp.required.length) {
+  ok(`数据收集声明：required = [${dcp.required.join(', ')}]`);
+} else {
+  bad('缺少 browser_specific_settings.gecko.data_collection_permissions.required（AMO 会拒绝）');
+}
+if (Number(gecko.strict_min_version) < 140 && dcp) {
+  bad(`data_collection_permissions 需要 Firefox 140+，当前 strict_min_version = ${gecko.strict_min_version}`);
+}
 
 const mainWorld = manifest.content_scripts.filter((cs) => cs.world === 'MAIN');
 if (mainWorld.length) ok(`${mainWorld.length} 段 content script 声明了 world: MAIN`);
