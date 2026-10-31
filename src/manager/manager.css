@@ -1,0 +1,460 @@
+:root {
+  --pink: #fb7299;
+  --pink-soft: rgba(251, 114, 153, 0.12);
+  --pink-line: rgba(251, 114, 153, 0.35);
+  --text: #18191c;
+  --text-2: #61666d;
+  --text-3: #9499a0;
+  --line: #e6e8ea;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e3e5e7;
+    --text-2: #a9aeb5;
+    --text-3: #7c8189;
+    --line: #2f3134;
+    --bg: #17181b;
+    --card: #1f2125;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.25);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  padding-bottom: 64px;
+}
+
+/* ---------------------------------- 顶栏 ---------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px clamp(16px, 4vw, 40px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand img {
+  border-radius: 8px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.stat {
+  margin: 1px 0 0;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.search {
+  width: min(46vw, 420px);
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px var(--pink-soft);
+}
+
+select,
+.btn {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+select {
+  padding-right: 8px;
+}
+
+.btn:hover {
+  border-color: var(--pink-line);
+  color: var(--pink);
+}
+
+.menu {
+  position: relative;
+}
+
+.menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 178px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.menu-panel[hidden] {
+  display: none;
+}
+
+.menu-panel button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-panel button:hover {
+  background: var(--pink-soft);
+}
+
+.menu-panel small {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+/* --------------------------------- 标签栏 --------------------------------- */
+
+.tagbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px clamp(16px, 4vw, 40px) 0;
+}
+
+.tagbar:empty {
+  display: none;
+}
+
+.chip {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text-2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--pink-line);
+  color: var(--pink);
+}
+
+.chip[data-active="1"] {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: #fff;
+}
+
+.chip small {
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+/* ---------------------------------- 列表 ---------------------------------- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px clamp(16px, 4vw, 40px);
+  max-width: 1080px;
+}
+
+.card {
+  padding: 14px 16px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--pink-line);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.author {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--pink-soft);
+  color: var(--pink);
+  font-size: 11px;
+}
+
+.src {
+  color: var(--text-3);
+  text-decoration: none;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.src:hover {
+  color: var(--pink);
+  text-decoration: underline;
+}
+
+.text {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 14px;
+  line-height: 1.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.text[data-open="1"] {
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 9px;
+  border-radius: 999px;
+  background: var(--pink-soft);
+  color: var(--pink);
+  font-size: 12px;
+}
+
+.tag button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.tag button:hover {
+  opacity: 1;
+  background: rgba(251, 114, 153, 0.2);
+}
+
+.tag-input {
+  width: 96px;
+  padding: 3px 8px;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.tag-input:focus {
+  border-style: solid;
+  border-color: var(--pink);
+}
+
+.note {
+  width: 100%;
+  margin-top: 9px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 34px;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.note:focus {
+  border-color: var(--pink-line);
+  background: var(--card);
+}
+
+.note::placeholder {
+  color: var(--text-3);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.actions button {
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.actions button:hover {
+  border-color: var(--pink-line);
+  color: var(--pink);
+}
+
+.actions .danger:hover {
+  border-color: rgba(255, 77, 79, 0.5);
+  color: #ff4d4f;
+}
+
+.like {
+  margin-left: auto;
+  color: var(--text-3);
+  font-size: 12px;
+}
+
+/* ---------------------------------- 空态 ---------------------------------- */
+
+.empty {
+  padding: 72px 24px;
+  text-align: center;
+  color: var(--text-3);
+}
+
+.empty-title {
+  margin: 0 0 6px;
+  color: var(--text-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.empty-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.more {
+  padding: 0 clamp(16px, 4vw, 40px) 24px;
+}
+
+.more[hidden] {
+  display: none;
+}
+
+/* --------------------------------- 提示条 --------------------------------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 10px);
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: rgba(24, 25, 28, 0.92);
+  color: #fff;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  max-width: 80vw;
+}
+
+.toast[data-show="1"] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}

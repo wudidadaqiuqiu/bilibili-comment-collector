@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>B站评论收藏夹</title>
+    <link rel="stylesheet" href="manager.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="../icons/icon48.png" alt="" width="26" height="26" />
+        <div>
+          <h1>B站评论收藏夹</h1>
+          <p id="stat" class="stat">正在读取…</p>
+        </div>
+      </div>
+
+      <div class="tools">
+        <input id="q" class="search" type="search" placeholder="搜索正文 / 作者 / 备注 / 视频标题　（支持 tag:标签）" autocomplete="off" />
+        <select id="sort" title="排序">
+          <option value="createdAt-desc">最新收藏</option>
+          <option value="createdAt-asc">最早收藏</option>
+          <option value="like-desc">点赞最多</option>
+          <option value="source-asc">按视频分组</option>
+        </select>
+        <div class="menu">
+          <button id="exportBtn" class="btn" type="button" aria-haspopup="true" aria-expanded="false">导出 ▾</button>
+          <div id="exportPanel" class="menu-panel" hidden>
+            <button type="button" data-format="markdown">Markdown<small>适合贴进笔记</small></button>
+            <button type="button" data-format="json">JSON<small>可再导入回来</small></button>
+            <button type="button" data-format="csv">CSV<small>Excel 可直接打开</small></button>
+          </div>
+        </div>
+        <button id="importBtn" class="btn" type="button">导入</button>
+        <input id="file" type="file" accept=".json,application/json" hidden />
+      </div>
+    </header>
+
+    <nav id="tagbar" class="tagbar"></nav>
+
+    <main>
+      <div id="list" class="list"></div>
+      <div id="more" class="more" hidden>
+        <button id="moreBtn" class="btn" type="button">加载更多</button>
+      </div>
+      <div id="empty" class="empty" hidden>
+        <p class="empty-title">还没有收藏</p>
+        <p class="empty-hint">
+          打开任意 B 站视频，鼠标移到评论上，点操作栏里的「☆ 收藏」。<br />
+          楼中楼回复也能收藏，收藏后会带上「跳回原楼层」的链接。
+        </p>
+      </div>
+    </main>
+
+    <div id="toast" class="toast" role="status"></div>
+
+    <script type="module" src="manager.js"></script>
+  </body>
+</html>

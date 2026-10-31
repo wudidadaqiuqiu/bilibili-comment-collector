@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>B站评论收藏夹</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="head">
+      <div class="brand">
+        <img src="../icons/icon32.png" alt="" width="20" height="20" />
+        <span>评论收藏夹</span>
+      </div>
+      <div class="count"><strong id="count">0</strong> 条</div>
+    </header>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="搜索正文 / 作者 / 备注，回车在收藏夹中打开" autocomplete="off" />
+    </div>
+
+    <ul id="recent" class="list"></ul>
+    <p id="empty" class="empty" hidden>
+      还没有收藏。打开任意 B 站视频，把鼠标放到评论上，点「☆ 收藏」。
+    </p>
+
+    <footer class="foot">
+      <button id="open" class="primary" type="button">打开收藏夹</button>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "B站评论收藏夹",
+  "version": "1.0.0",
+  "minimum_chrome_version": "111",
+  "description": "一键收藏 B 站评论和楼中楼回复。数据只存在本地，支持搜索、标签、备注、跳回原楼层，以及 Markdown / JSON / CSV 导出。",
+  "permissions": ["storage", "unlimitedStorage"],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "B站评论收藏夹",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "src/icons/icon16.png",
+      "32": "src/icons/icon32.png",
+      "48": "src/icons/icon48.png",
+      "128": "src/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "src/icons/icon16.png",
+    "32": "src/icons/icon32.png",
+    "48": "src/icons/icon48.png",
+    "128": "src/icons/icon128.png"
+  },
+  "options_page": "src/manager/manager.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.bilibili.com/video/*",
+        "https://www.bilibili.com/list/*",
+        "https://www.bilibili.com/bangumi/play/*",
+        "https://www.bilibili.com/medialist/play/*",
+        "https://www.bilibili.com/read/*",
+        "https://www.bilibili.com/opus/*",
+        "https://www.bilibili.com/festival/*",
+        "https://t.bilibili.com/*"
+      ],
+      "js": ["src/content/bridge.js"],
+      "world": "MAIN",
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://www.bilibili.com/video/*",
+        "https://www.bilibili.com/list/*",
+        "https://www.bilibili.com/bangumi/play/*",
+        "https://www.bilibili.com/medialist/play/*",
+        "https://www.bilibili.com/read/*",
+        "https://www.bilibili.com/opus/*",
+        "https://www.bilibili.com/festival/*",
+        "https://t.bilibili.com/*"
+      ],
+      "js": ["src/content/content.js"],
+      "css": ["src/content/content.css"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
