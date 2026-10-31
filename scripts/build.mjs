@@ -125,8 +125,21 @@ const version = manifest.version;
 
 const files = ['manifest.json', ...(await walk(path.join(root, 'src'), 'src')), 'LICENSE', 'README.md'];
 
+// 文本文件统一成 LF 再打进包：否则 Windows 工作区（CRLF）构建出的包
+// 会和 CI（LF）构建出的不一致，也让「包 vs 提交给 AMO 的源码」出现无意义的差异。
+const TEXT_RE = /\.(m?js|json|css|html|md|txt|ya?ml)$/i;
+const TEXT_NAMES = new Set(['LICENSE', '.gitignore', '.gitattributes']);
+
+const CRLF_RE = new RegExp(String.fromCharCode(13, 10), 'g');
+const LF_CHAR = String.fromCharCode(10);
+
+function normalizeEol(name, buf) {
+  if (!TEXT_RE.test(name) && !TEXT_NAMES.has(name)) return buf;
+  return Buffer.from(buf.toString('utf8').replace(CRLF_RE, LF_CHAR), 'utf8');
+}
+
 const readAll = async (list) =>
-  Promise.all(list.map(async (rel) => ({ name: rel, data: await readFile(path.join(root, rel)) })));
+  Promise.all(list.map(async (rel) => ({ name: rel, data: normalizeEol(rel, await readFile(path.join(root, rel))) })));
 
 await mkdir(distDir, { recursive: true });
 

@@ -47,7 +47,8 @@ B 站自带的「收藏」只能收藏视频，看到一条好评论，只能截
 
 **已通过 AMO 审核并获得 Mozilla 签名**（分发方式为 *On your own*，即自用分发，因此 AMO 商城没有公开页面）。
 
-安装：拿到签名后的 `.xpi`，直接拖进 Firefox 窗口；或 `about:addons` → 右上角齿轮 → **从文件安装附加组件**。
+安装：到 [Releases](../../releases) 下载 `bilibili-comment-collector-<ver>-firefox.xpi`（该文件就是 AMO 签发后的签名版），
+直接拖进 Firefox 窗口；或 `about:addons` → 右上角齿轮 → **从文件安装附加组件**。
 **装完永久生效，重启浏览器不会消失。**
 
 > - 需要 Firefox 140 或更高版本（AMO 自 2025-11-03 起强制要求 manifest 声明数据收集类型 `data_collection_permissions`，该字段只有 140+ 认识）。
